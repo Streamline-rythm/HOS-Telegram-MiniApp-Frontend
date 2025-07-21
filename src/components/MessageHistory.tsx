@@ -17,17 +17,17 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-      hour12: true 
+      hour12: true
     });
   };
 
   // Convert requests to chat messages
   const chatMessages: ChatMessage[] = [];
-  
+
   requests.forEach(request => {
     // Add driver request message
     chatMessages.push({
@@ -64,7 +64,11 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
 
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current.scrollIntoView({
+        behavior: 'auto',
+        block: 'end',
+        inline: 'nearest'
+      });
     }
   }, [chatMessages.length]);
 
@@ -78,51 +82,12 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
             <p className="text-sm text-muted-foreground">Send a request to start communication</p>
           </div>
         ) : (
-          // chatMessages.map((message) => (
-          //   <div
-          //     key={message.id}
-          //     className={`flex gap-3 animate-slide-up ${
-          //       message.sender === 'driver' ? 'justify-end' : 'justify-start'
-          //     }`}
-          //   >
-          //     {message.sender === 'dispatch' && (
-          //       <div className="flex-shrink-0">
-          //         <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
-          //           <User size={16} className="text-accent-foreground"/>
-          //         </div>
-          //       </div>
-          //     )}
-              
-          //     <div
-          //       className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-soft ${
-          //         message.sender === 'driver'
-          //           ? 'bg-primary text-primary-foreground'
-          //           : 'bg-card border border-border'
-          //       }`}
-          //     >
-          //       <p className="text-sm">{message.text}</p>
-          //       <div className="flex items-center gap-1 mt-2 opacity-70">
-          //         <Clock size={12} />
-          //         <span className="text-xs">{formatTime(message.timestamp)}</span>
-          //       </div>
-          //     </div>
-
-          //     {message.sender === 'driver' && (
-          //       <div className="flex-shrink-0">
-          //         <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-          //           <Truck size={16} className="text-primary-foreground" />
-          //         </div>
-          //       </div>
-          //     )}
-          //   </div>
-          // ))
           <>
             {chatMessages.map((message) => (
               <div
                 key={message.id}
-                className={`flex gap-3 animate-slide-up ${
-                  message.sender === 'driver' ? 'justify-end' : 'justify-start'
-                }`}
+                className={`flex gap-3 animate-slide-up ${message.sender === 'driver' ? 'justify-end' : 'justify-start'
+                  }`}
               >
                 {message.sender === 'dispatch' && (
                   <div className="flex-shrink-0">
@@ -131,13 +96,12 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
                     </div>
                   </div>
                 )}
-                
+
                 <div
-                  className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-soft ${
-                    message.sender === 'driver'
+                  className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-soft ${message.sender === 'driver'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-card border border-border'
-                  }`}
+                    }`}
                 >
                   <p className="text-sm">{message.text}</p>
                   <div className="flex items-center gap-1 mt-2 opacity-70">
