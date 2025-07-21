@@ -5,6 +5,7 @@ import { CustomMessageInput } from "@/components/CustomMessageInput";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Activity, Truck } from "lucide-react";
+import driverAvatar from '@/assets/driver-avatar.png';
 
 interface DriverRequest {
   id: string;
@@ -60,7 +61,7 @@ const Index = () => {
             <div className="flex items-center gap-3">
               <div className="relative">
                 <img
-                  src="./src/assets/driver-avatar.png"
+                  src={driverAvatar}
                   alt="Driver"
                   className="w-[50px] h-[50px] rounded-full border-2 border-primary-border"
                 />
