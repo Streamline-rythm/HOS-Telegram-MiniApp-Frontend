@@ -124,7 +124,7 @@ export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
       <h3 className="text-base font-semibold text-foreground mb-2">Driver Request Templates</h3>
       {/* Compact Template Message Buttons */}
       <div className="flex-1 space-y-2 overflow-y-auto ">
-        <div className="space-y-2 pb-2 w-full">
+        <div className="space-y-2 w-full">
 
           {templates.map((template) => {
             const Icon = template.icon;
@@ -135,7 +135,7 @@ export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
                 <AlertDialogTrigger asChild>
                   <Button
                     variant="template"
-                    className="w-full justify-start gap-3 p-4 h-auto min-h-[60px] flex-col items-start bg-primary "
+                    className="w-full justify-start gap-3 px-4 py-2 h-auto min-h-[60px] flex-col items-start bg-primary "
                     >
                     <div className="flex items-center gap-3 w-full">
                       <Icon size={22} />
