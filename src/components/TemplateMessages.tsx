@@ -80,7 +80,7 @@ export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
   const quickTimeOptions = ["30min", "1h", "4h", "11h"];
 
   return (
-    <div className="h-full max-w-full flex flex-col px-4 py-2 space-y-2 ">
+    <div className="h-full max-w-full flex flex-col px-4 pt-3 space-y-2 ">
       {/* Compact Time Selector */}
       <div className="bg-primary rounded-xl px-3 py-2 shadow-soft flex-shrink-0 w-full">
         <div className="text-center mb-2">

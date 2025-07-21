@@ -12,6 +12,7 @@ interface DriverRequest {
   timestamp: Date;
   status: 'sent' | 'acknowledged' | 'completed';
   response?: string;
+  responseTimestamp?: Date;
 }
 
 const Index = () => {
@@ -26,8 +27,8 @@ const Index = () => {
         if (latestRequest.status === 'sent') {
           setRequests(prev => prev.map(req =>
             req.id === latestRequest.id
-              ? { ...req, status: 'acknowledged', response: "Request received. Processing..." }
-              : req
+            ? { ...req, status: 'acknowledged', response: "Request received. Processing...", responseTimestamp: new Date() }
+            : req
           ));
         }
       }
@@ -97,7 +98,7 @@ const Index = () => {
               <TemplateMessages onSendMessage={handleSendRequest} />
             </TabsContent>
 
-            <TabsContent value="status" className="data-[state=active]:flex-1 data-[state=active]:flex data-[state=active]:flex-col mt-4 min-h-0">
+            <TabsContent value="status" className="data-[state=active]:flex-1 data-[state=active]:flex data-[state=active]:flex-col mt-2 min-h-0">
               <RequestStatus requests={requests} />
             </TabsContent>
 
@@ -105,7 +106,7 @@ const Index = () => {
         </div>
 
         {/* ------------------ Custom Input ------------------ */}
-        <div className="border bg-card p-4 mx-4 mb-4 mt-2 rounded-lg shadow-soft flex-shrink-0">
+        <div className="border bg-card p-4 mx-4 mb-4 mt-2 rounded-lg shadow-soft flex-shrink-0 z-50">
           <CustomMessageInput onSendMessage={handleSendRequest} />
         </div>
 
