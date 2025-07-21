@@ -52,7 +52,7 @@ const Index = () => {
 
   return (
     <div className="h-screen flex flex-col justify-center items-center bg-gray-900">
-      <div className="h-full min-w-[350px] max-w-[500px] w-full bg-background flex flex-col relative overflow-y-hidden ">
+      <div className="h-full min-w-[350px] max-w-[800px] w-full bg-background flex flex-col relative overflow-y-hidden ">
 
         {/* ------------------ Title Bar ------------------*/}
 
