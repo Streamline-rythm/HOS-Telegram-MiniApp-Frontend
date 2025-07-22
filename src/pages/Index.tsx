@@ -42,7 +42,7 @@ const Index = () => {
         })
       }
     });
-    console.log("allHistory=", cache[0]);
+    setRequests(cache);
   }
 
   //----------------------at the first render -------------------------
