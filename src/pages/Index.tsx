@@ -32,12 +32,14 @@ const Index = () => {
       cache.push(newRequest);
 
       if (each.replies) {
-        const newResponse: DriverRequest = {
-          request: each.replies.reply_content,
-          timestamp: each.replies.reply_at,
-          sender: 'dispatcher',
-        };
-        cache.push(newResponse);
+        each.replies.forEach(item => {
+          const newResponse: DriverRequest = {
+            request: item.reply_content,
+            timestamp: item.reply_at,
+            sender: 'dispatcher',
+          };
+          cache.push(newResponse);
+        })
       }
     });
 
@@ -62,12 +64,12 @@ const Index = () => {
     //------------------- fetching chatting history -----------------------------
     if (user) {
       fetch(`http://localhost:8000/messages?userId=${user.id}`)
-      .then(res => {
-        if (!res.ok) throw new Error('Network response was not ok');
-        return res.json();
-      })
-      .then(data => handleAllHistory(data))
-      .catch(err => console.log(err.message));
+        .then(res => {
+          if (!res.ok) throw new Error('Network response was not ok');
+          return res.json();
+        })
+        .then(data => handleAllHistory(data))
+        .catch(err => console.log(err.message));
     }
 
     //-------------------- socket connection -------------------------------------
