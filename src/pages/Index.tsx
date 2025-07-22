@@ -39,17 +39,30 @@ const Index = () => {
       body: JSON.stringify({ telegramId: userId })
     }).then(res => {
       if (!res.ok) {
-        webApp.showAlert("❌ You are not authorized to use this service.");
-        webApp.close(); // Optionally close the Mini App
+        webApp.showPopup({
+          title: "Unauthorized",
+          message: "❌ You are not authorized to use this service.",
+          buttons: [{ id: "ok", type: "ok", text: "OK" }]
+        }, (buttonId: string) => {
+          if (buttonId === "ok") {
+            webApp.close();
+          }
+        }); // Optionally close the Mini App
       }
     }).catch(err => {
       console.error("Error verifying user:", err);
-      webApp.showAlert("❌ Something went wrong. Please try again later.");
-      webApp.close();
+      webApp.showPopup({
+        title: "Unauthorized",
+        message: "❌ Something went wrong. Please try again later.",
+        buttons: [{ id: "ok", type: "ok", text: "OK" }]
+      }, (buttonId: string) => {
+        if (buttonId === "ok") {
+          webApp.close();
+        }
+      });
     });
   };
   
-
   // -------------------- Arrange chatting history --------------------
   const handleAllHistory = (allHistory: any[]) => {
     const cache: DriverRequest[] = [];
