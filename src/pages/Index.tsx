@@ -27,246 +27,235 @@ const Index = () => {
   // -------------------- Verify if user is member or not -------------
 
   const verifyUser = (userId: number) => {
-    const webApp =  window.Telegram.WebApp as any;
+    const webApp = window.Telegram.WebApp as any;
     if (typeof window.Telegram === 'undefined' || !window.Telegram.WebApp) {
       alert("❌ Telegram WebApp is not available. Please open this Mini App from Telegram.");
       return;
     }
-  
+
     fetch(`${basicUrl}/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ telegramId: userId })
     }).then(res => {
       if (!res.ok) {
-        webApp.showPopup({
-          title: "Unauthorized",
-          message: "❌ You are not authorized to use this service.",
-          buttons: [{ id: "ok", type: "ok", text: "OK" }]
-        }, (buttonId: string) => {
-          if (buttonId === "ok") {
-            webApp.close();
-          }
-        }); // Optionally close the Mini App
+        webApp.showAlert("❌ Unauthorized access.");
+        setTimeout(() => {
+          webApp.close();
+        }, 100);
       }
     }).catch(err => {
       console.error("Error verifying user:", err);
-      webApp.showPopup({
-        title: "Unauthorized",
-        message: "❌ Something went wrong. Please try again later.",
-        buttons: [{ id: "ok", type: "ok", text: "OK" }]
-      }, (buttonId: string) => {
-        if (buttonId === "ok") {
-          webApp.close();
+      webApp.showAlert("❌ Something went wrong. Please try again.");
+      setTimeout(() => {
+        webApp.close();
+      }, 100);});
+    };
+
+    // -------------------- Arrange chatting history --------------------
+    const handleAllHistory = (allHistory: any[]) => {
+      const cache: DriverRequest[] = [];
+      allHistory.forEach(each => {
+        const newRequest: DriverRequest = {
+          request: each.content,
+          timestamp: each.created_at,
+          sender: "driver",
+        };
+        cache.push(newRequest);
+
+        if (each.replies && Array.isArray(each.replies)) {
+          each.replies.forEach(item => {
+            const newResponse: DriverRequest = {
+              request: item.reply_content,
+              timestamp: item.reply_at,
+              sender: 'dispatcher',
+            };
+            cache.push(newResponse);
+          })
         }
       });
-    });
-  };
-  
-  // -------------------- Arrange chatting history --------------------
-  const handleAllHistory = (allHistory: any[]) => {
-    const cache: DriverRequest[] = [];
-    allHistory.forEach(each => {
-      const newRequest: DriverRequest = {
-        request: each.content,
-        timestamp: each.created_at,
-        sender: "driver",
-      };
-      cache.push(newRequest);
+      setRequests(cache);
+    }
 
-      if (each.replies && Array.isArray(each.replies)) {
-        each.replies.forEach(item => {
-          const newResponse: DriverRequest = {
-            request: item.reply_content,
-            timestamp: item.reply_at,
-            sender: 'dispatcher',
-          };
-          cache.push(newResponse);
-        })
-      }
-    });
-    setRequests(cache);
-  }
-
-  //----------------------at the first render -------------------------
-  useEffect(() => {
-    setIsLoading(true);
-    console.log("loading start");
-    //-------------------- Getting user telegram Id ------------------------------
-    let user;
-    if (window.Telegram.WebApp) {
-      user = window.Telegram.WebApp.initDataUnsafe?.user;
-      if (user) {
-        setUserId(user.id);
+    //----------------------at the first render -------------------------
+    useEffect(() => {
+      setIsLoading(true);
+      console.log("loading start");
+      //-------------------- Getting user telegram Id ------------------------------
+      let user;
+      if (window.Telegram.WebApp) {
+        user = window.Telegram.WebApp.initDataUnsafe?.user;
+        if (user) {
+          setUserId(user.id);
+        } else {
+          console.warn("User info not available.");
+        }
       } else {
-        console.warn("User info not available.");
+        console.error("Telegram WebApp not available.");
       }
-    } else {
-      console.error("Telegram WebApp not available.");
-    }
 
-    verifyUser(user);
+      verifyUser(user);
 
-    //------------------- fetching chatting history -----------------------------
-    if (user) {
-      fetch(`${basicUrl}/messages?userId=${user.id}`)
-        .then(res => {
-          if (!res.ok) throw new Error('Network response was not ok');
-          return res.json();
-        })
-        .then(data => handleAllHistory(data))
-        .catch(err => console.log(err.message));
-    }
+      //------------------- fetching chatting history -----------------------------
+      if (user) {
+        fetch(`${basicUrl}/messages?userId=${user.id}`)
+          .then(res => {
+            if (!res.ok) throw new Error('Network response was not ok');
+            return res.json();
+          })
+          .then(data => handleAllHistory(data))
+          .catch(err => console.log(err.message));
+      }
 
-    //-------------------- socket connection -------------------------------------
-    socketRef.current = io(`${basicUrl}`);
+      //-------------------- socket connection -------------------------------------
+      socketRef.current = io(`${basicUrl}`);
 
-    //-------------------- Listen replied message --------------------------------
-    if (!socketRef.current) return;
-    socketRef.current.on('reply', (reply: { messageId: number, reply: string }) => {
+      //-------------------- Listen replied message --------------------------------
+      if (!socketRef.current) return;
+      socketRef.current.on('reply', (reply: { messageId: number, reply: string }) => {
+        const newRequest: DriverRequest = {
+          request: reply.reply,
+          timestamp: new Date(),
+          sender: "dispatcher",
+        };
+
+        setRequests(prev => [...prev, newRequest]);
+        setActiveTab("status");
+
+      });
+
+      setIsLoading(false);
+      console.log("loading end");
+
+      return () => { socketRef.current.disconnect(); };
+    }, []);
+
+
+    //---------------------- sending request to server -----------------------------
+    const handleSendRequest = (requestText: string) => {
+      //-------------------- store message to chating history ----------------------
       const newRequest: DriverRequest = {
-        request: reply.reply,
+        request: requestText,
         timestamp: new Date(),
-        sender: "dispatcher",
+        sender: "driver",
       };
 
       setRequests(prev => [...prev, newRequest]);
       setActiveTab("status");
 
-    });
-
-    setIsLoading(false);
-    console.log("loading end");
-
-    return () => { socketRef.current.disconnect(); };
-  }, []);
-
-
-  //---------------------- sending request to server -----------------------------
-  const handleSendRequest = (requestText: string) => {
-    //-------------------- store message to chating history ----------------------
-    const newRequest: DriverRequest = {
-      request: requestText,
-      timestamp: new Date(),
-      sender: "driver",
+      //------------------- sending message part -----------------------------------
+      if (!userId) {
+        alert('Please enter your userId before sending messages.');
+        return;
+      }
+      if (!requestText) return;
+      socketRef.current.emit('chat message', {
+        userId,
+        content: requestText,
+      });
     };
 
-    setRequests(prev => [...prev, newRequest]);
-    setActiveTab("status");
+    if (isLoading) {
+      return (
+        <div className="h-screen bg-background flex flex-col">
+          {/* Header Skeleton */}
+          <div className="bg-gradient-primary text-primary-foreground p-4 shadow-soft flex-shrink-0">
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-10 h-10 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-3 w-32" />
+                </div>
+              </div>
+              <Skeleton className="w-8 h-8 rounded-md" />
+            </div>
+          </div>
 
-    //------------------- sending message part -----------------------------------
-    if (!userId) {
-      alert('Please enter your userId before sending messages.');
-      return;
+          {/* Main Content Skeleton */}
+          <div className="flex-1 flex flex-col min-h-0 mx-4">
+            <div className="mt-4 space-y-4">
+              <Skeleton className="h-10 w-full rounded-md" />
+              <div className="space-y-3">
+                <Skeleton className="h-20 w-full rounded-lg" />
+                <Skeleton className="h-20 w-full rounded-lg" />
+                <Skeleton className="h-20 w-full rounded-lg" />
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Input Skeleton */}
+          <div className="border-t bg-card p-4 mx-4 mb-4 mt-3 rounded-lg shadow-soft flex-shrink-0">
+            <Skeleton className="h-10 w-full rounded-md" />
+          </div>
+        </div>
+      )
     }
-    if (!requestText) return;
-    socketRef.current.emit('chat message', {
-      userId,
-      content: requestText,
-    });
+
+    return (
+      <div className="h-screen flex flex-col justify-center items-center bg-gray-900">
+        <div className="h-full min-w-[350px] max-w-[800px] w-full bg-background flex flex-col relative overflow-y-hidden ">
+
+          {/* ------------------ Title Bar ------------------*/}
+
+          <div className="bg-primary text-primary-foreground p-3 shadow-soft flex-shrink-0">
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <img
+                    src={driverAvatar}
+                    alt="Driver"
+                    className="w-[50px] h-[50px] rounded-full border-2 border-primary-border"
+                  />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-success rounded-full border-2 border-primary-border"></div>
+                </div>
+                <div>
+                  <h1 className="font-bold text-lg">HOS support</h1>
+                  <p className="text-sm opacity-85">Smart AI Communication</p>
+                </div>
+              </div>
+              <ThemeToggle />
+            </div>
+          </div>
+
+          {/* ------------------ Main Page ------------------ */}
+
+          <div className="flex-1 flex flex-col mx-4 min-h-0">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+
+              {/* ------------------ Tablist(templates, status) ------------------ */}
+              <TabsList className="grid w-full grid-cols-2 mt-2 flex-shrink-0">
+                <TabsTrigger value="templates" className="flex items-center gap-2">
+                  <Truck size={20} />
+                  Driver Requests
+                </TabsTrigger>
+                <TabsTrigger value="status" className="flex items-center gap-2">
+                  <Activity size={20} />
+                  Status
+                </TabsTrigger>
+              </TabsList>
+
+              {/* ------------------ Driver Request Content ------------------ */}
+
+              <TabsContent value="templates" className="data-[state=active]:flex-1 mt-0 overflow-hidden min-h-0">
+                <TemplateMessages onSendMessage={handleSendRequest} />
+              </TabsContent>
+
+              <TabsContent value="status" className="data-[state=active]:flex-1 data-[state=active]:flex data-[state=active]:flex-col mt-2 min-h-0">
+                <RequestStatus requests={requests} />
+              </TabsContent>
+
+            </Tabs>
+          </div>
+
+          {/* ------------------ Custom Input ------------------ */}
+          <div className="border bg-card p-4 mx-4 mb-4 mt-2 rounded-lg shadow-soft flex-shrink-0 z-50">
+            <CustomMessageInput onSendMessage={handleSendRequest} />
+          </div>
+
+        </div>
+      </div>
+    );
   };
 
-  if (isLoading) {
-    return (
-      <div className="h-screen bg-background flex flex-col">
-        {/* Header Skeleton */}
-        <div className="bg-gradient-primary text-primary-foreground p-4 shadow-soft flex-shrink-0">
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center gap-3">
-              <Skeleton className="w-10 h-10 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-3 w-32" />
-              </div>
-            </div>
-            <Skeleton className="w-8 h-8 rounded-md" />
-          </div>
-        </div>
-
-        {/* Main Content Skeleton */}
-        <div className="flex-1 flex flex-col min-h-0 mx-4">
-          <div className="mt-4 space-y-4">
-            <Skeleton className="h-10 w-full rounded-md" />
-            <div className="space-y-3">
-              <Skeleton className="h-20 w-full rounded-lg" />
-              <Skeleton className="h-20 w-full rounded-lg" />
-              <Skeleton className="h-20 w-full rounded-lg" />
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Input Skeleton */}
-        <div className="border-t bg-card p-4 mx-4 mb-4 mt-3 rounded-lg shadow-soft flex-shrink-0">
-          <Skeleton className="h-10 w-full rounded-md" />
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="h-screen flex flex-col justify-center items-center bg-gray-900">
-      <div className="h-full min-w-[350px] max-w-[800px] w-full bg-background flex flex-col relative overflow-y-hidden ">
-
-        {/* ------------------ Title Bar ------------------*/}
-
-        <div className="bg-primary text-primary-foreground p-3 shadow-soft flex-shrink-0">
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <img
-                  src={driverAvatar}
-                  alt="Driver"
-                  className="w-[50px] h-[50px] rounded-full border-2 border-primary-border"
-                />
-                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-success rounded-full border-2 border-primary-border"></div>
-              </div>
-              <div>
-                <h1 className="font-bold text-lg">HOS support</h1>
-                <p className="text-sm opacity-85">Smart AI Communication</p>
-              </div>
-            </div>
-            <ThemeToggle />
-          </div>
-        </div>
-
-        {/* ------------------ Main Page ------------------ */}
-
-        <div className="flex-1 flex flex-col mx-4 min-h-0">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-
-            {/* ------------------ Tablist(templates, status) ------------------ */}
-            <TabsList className="grid w-full grid-cols-2 mt-2 flex-shrink-0">
-              <TabsTrigger value="templates" className="flex items-center gap-2">
-                <Truck size={20} />
-                Driver Requests
-              </TabsTrigger>
-              <TabsTrigger value="status" className="flex items-center gap-2">
-                <Activity size={20} />
-                Status
-              </TabsTrigger>
-            </TabsList>
-
-            {/* ------------------ Driver Request Content ------------------ */}
-
-            <TabsContent value="templates" className="data-[state=active]:flex-1 mt-0 overflow-hidden min-h-0">
-              <TemplateMessages onSendMessage={handleSendRequest} />
-            </TabsContent>
-
-            <TabsContent value="status" className="data-[state=active]:flex-1 data-[state=active]:flex data-[state=active]:flex-col mt-2 min-h-0">
-              <RequestStatus requests={requests} />
-            </TabsContent>
-
-          </Tabs>
-        </div>
-
-        {/* ------------------ Custom Input ------------------ */}
-        <div className="border bg-card p-4 mx-4 mb-4 mt-2 rounded-lg shadow-soft flex-shrink-0 z-50">
-          <CustomMessageInput onSendMessage={handleSendRequest} />
-        </div>
-
-      </div>
-    </div>
-  );
-};
-
-export default Index;
+  export default Index;
