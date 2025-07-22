@@ -47,8 +47,9 @@ const Index = () => {
   //----------------------at the first render -------------------------
   useEffect(() => {
     //-------------------- Getting user telegram Id ------------------------------
+    let user;
     if (window.Telegram.WebApp) {
-      const user = window.Telegram.WebApp.initDataUnsafe?.user;
+      user = window.Telegram.WebApp.initDataUnsafe?.user;
       if (user) {
         setUserId(user.id);
       } else {
@@ -59,8 +60,8 @@ const Index = () => {
     }
 
     //------------------- fetching chatting history -----------------------------
-    if (userId) {
-      fetch(`http://localhost:8000/messages?userId=${userId}`)
+    if (user) {
+      fetch(`http://localhost:8000/messages?userId=${user.id}`)
       .then(res => {
         if (!res.ok) throw new Error('Network response was not ok');
         return res.json();
