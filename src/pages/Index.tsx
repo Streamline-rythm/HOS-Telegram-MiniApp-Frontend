@@ -120,18 +120,20 @@ const Index = () => {
     });
   };
 
-  {isLoading && (
-    <div className="flex gap-3 justify-start">
-      <div className="flex-shrink-0">
-        <Skeleton className="w-8 h-8 rounded-full" />
+  if (isLoading) {
+    return (
+      <div className="flex gap-3 justify-start">
+        <div className="flex-shrink-0">
+          <Skeleton className="w-8 h-8 rounded-full" />
+        </div>
+        <div className="max-w-xs lg:max-w-md space-y-2">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-16" />
+        </div>
       </div>
-      <div className="max-w-xs lg:max-w-md space-y-2">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-3 w-16" />
-      </div>
-    </div>
-  )}
+    )
+  }
 
   return (
     <div className="h-screen flex flex-col justify-center items-center bg-gray-900">
