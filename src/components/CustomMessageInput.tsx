@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState } from "react"; // Import react hook
+
+// ---------------------- Import Component of UI -------------------------
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, MessageSquare } from "lucide-react";
 
-interface CustomMessageInputProps {
-  onSendMessage: (message: string) => void;
-}
+// ---------------------- Import types, constants, avatar and icons ----------
+import { Send, MessageSquare } from "lucide-react";
+import { CustomMessageInputProps } from "@/types";
 
 export function CustomMessageInput({ onSendMessage }: CustomMessageInputProps) {
   const [message, setMessage] = useState("");

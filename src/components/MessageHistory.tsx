@@ -1,17 +1,8 @@
-import { MessageCircle, Clock, User, Truck } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react"; // Import react hook
 
-interface ChatMessage {
-  id: string;
-  text: string;
-  timestamp: Date;
-  sender: 'driver' | 'dispatch';
-  type?: 'request' | 'response' | 'status';
-}
-
-interface ChatHistoryProps {
-  requests: any[];
-}
+// ---------------------- Import types, constants, avatar and icons ----------
+import { MessageCircle, Clock, User, Truck } from "lucide-react"; 
+import { ChatMessage, ChatHistoryProps } from "@/types";
 
 export function RequestStatus({ requests }: ChatHistoryProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -29,7 +20,7 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
   const chatMessages: ChatMessage[] = [];
 
   requests.forEach(request => {
-    // Add driver request message
+    // ----------------- Add driver request message ---------------
     chatMessages.push({
       id: `${request.id}-request`,
       text: request.request,
@@ -38,7 +29,7 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
       type: 'request'
     });
 
-    // Add dispatch response if exists
+    // ---------------- Add dispatch response if exists -----------
     if (request.status === 'acknowledged' && request.response) {
       chatMessages.push({
         id: `${request.id}-response`,
@@ -50,8 +41,7 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
     }
   });
 
-  // Sort by timestamp
-  // chatMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+  // ----------------- Sort by timestamp ------------------------
   chatMessages.sort((a, b) => {
     const timeDiff = a.timestamp.getTime() - b.timestamp.getTime();
     // If timestamps are the same, prioritize requests over responses

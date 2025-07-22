@@ -1,44 +1,61 @@
-import { useState, useEffect } from "react";
-import { TemplateMessages } from "@/components/TemplateMessages";
-import { RequestStatus } from "@/components/MessageHistory";
-import { CustomMessageInput } from "@/components/CustomMessageInput";
+import { useState, useEffect, useRef } from "react"; // Import react hook
+import { io } from 'socket.io-client'; // Import socket for real-time chatting
+
+// ---------------------- Import Component of UI -------------------------
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { RequestStatus } from "@/components/MessageHistory";
+import { TemplateMessages } from "@/components/TemplateMessages";
+import { CustomMessageInput } from "@/components/CustomMessageInput";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, Truck } from "lucide-react";
+
+// ---------------------- Import types, constants, avatar and icons ----------
+import { DriverRequest } from "@/types";
 import driverAvatar from '@/assets/driver-avatar.png';
+import { Activity, Truck } from "lucide-react";
 
-interface DriverRequest {
-  id: string;
-  request: string;
-  timestamp: Date;
-  status: 'sent' | 'acknowledged' | 'completed';
-  response?: string;
-  responseTimestamp?: Date;
-}
 
+// =============================================================================
 const Index = () => {
-  const [requests, setRequests] = useState<DriverRequest[]>([]);
-  const [activeTab, setActiveTab] = useState("templates");
-
-  // Simulate dispatch acknowledgment for demo
+  const [requests, setRequests] = useState<DriverRequest[]>([]); // Requests history
+  const [activeTab, setActiveTab] = useState("templates"); // Switching tabs flag
+  const [userId, setUserId] = useState<number>(); // User telegram Id
+  const socketRef = useRef(null);
+  
+  //----------------------at the first render -------------------------
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (requests.length > 0) {
-        const latestRequest = requests[requests.length - 1];
-        if (latestRequest.status === 'sent') {
-          setRequests(prev => prev.map(req =>
-            req.id === latestRequest.id
-            ? { ...req, status: 'acknowledged', response: "Request received. Processing...", responseTimestamp: new Date() }
-            : req
-          ));
+    //-------------------- Getting user telegram Id ------------------------------
+    if (window.Telegram.WebApp) {
+      const user = window.Telegram.WebApp.initDataUnsafe?.user;
+      if (user) {
+        setUserId(user.id);
+      } else {
+        console.warn("User info not available.");
         }
+      } else {
+        console.error("Telegram WebApp not available.");
       }
-    }, 2000);
 
-    return () => clearTimeout(timer);
-  }, [requests]);
+    //------------------- fetching chatting history -----------------------------
+    // if (userId) {
+    //   fetch(`http://localhost:8000/messages?userId=${userId}`)
+    //   .then(res => {
+    //     if (!res.ok) throw new Error('Network response was not ok');
+    //     return res.json();
+    //   })
+    //   .then(data => setRequests(data))
+    //   .catch(err => console.log(err.message));
+    // }
+    
+  //-------------------- socket connection -------------------------------------
+    socketRef.current = io('http://localhost:8000'); 
 
+    return () => { socketRef.current.disconnect(); }; 
+  }, []);
+
+
+  //---------------------- sending request to server -----------------------------
   const handleSendRequest = (requestText: string) => {
+    //-------------------- store message to chating history ----------------------
     const newRequest: DriverRequest = {
       id: Date.now().toString(),
       request: requestText,
@@ -48,7 +65,19 @@ const Index = () => {
 
     setRequests(prev => [...prev, newRequest]);
     setActiveTab("status");
+
+    //------------------- sending message part -----------------------------------
+    if (!userId) {
+          alert('Please enter your userId before sending messages.');
+          return;
+        }
+        if (!requestText) return;
+        socketRef.current.emit('chat message', {
+          userId,
+          content: requestText,
+        });
   };
+
 
   return (
     <div className="h-screen flex flex-col justify-center items-center bg-gray-900">
@@ -81,7 +110,7 @@ const Index = () => {
         <div className="flex-1 flex flex-col mx-4 min-h-0">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
 
-            {/* ------------------ Tablist(request, chatting history) ------------------ */}
+            {/* ------------------ Tablist(templates, status) ------------------ */}
             <TabsList className="grid w-full grid-cols-2 mt-2 flex-shrink-0">
               <TabsTrigger value="templates" className="flex items-center gap-2">
                 <Truck size={20} />

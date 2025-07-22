@@ -1,74 +1,21 @@
-import { useState } from "react";
+import { useState } from "react"; // Import react hook
+
+// ---------------------- Import Component of UI -------------------------
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Clock, MapPin, Coffee, Shield, Search, Send, Timer } from "lucide-react";
 
-interface TemplateMessage {
-  id: string;
-  text: string;
-  icon: any;
-  needsTime?: boolean;
-  variant: 'template' | 'accent' | 'success';
-  description: string;
-}
+// ---------------------- Import types, constants, avatar and icons ----------
+import { Clock, Send} from "lucide-react";
+import { TemplateMessage, TemplateMessagesProps } from "@/types";
+import { templates, timeOptions, quickTimeOptions } from "@/constant";
 
-const templates: TemplateMessage[] = [
-  {
-    id: 'pretrip',
-    text: 'Pre Trip Inspection',
-    icon: MapPin,
-    needsTime: true,
-    variant: 'template',
-    description: 'Required safety check before starting'
-  },
-  {
-    id: 'break',
-    text: 'Break Time',
-    icon: Coffee,
-    needsTime: true,
-    variant: 'accent',
-    description: 'Rest period notification'
-  },
-  {
-    id: 'reset',
-    text: 'Hour Reset',
-    icon: Timer,
-    needsTime: true,
-    variant: 'success',
-    description: 'Mandatory reset period'
-  },
-  {
-    id: 'violations',
-    text: 'Check Violations',
-    icon: Shield,
-    needsTime: false,
-    variant: 'template',
-    description: 'Review compliance status'
-  },
-  {
-    id: 'inspection',
-    text: 'Getting DOT Inspection',
-    icon: Search,
-    needsTime: false,
-    variant: 'accent',
-    description: 'Department of Transportation check'
-  }
-];
-
-const timeOptions = Array.from({ length: 40 }, (_, i) => ({
-  value: `${i + 1}h`,
-  label: `${i + 1} hour${i === 0 ? '' : 's'}`,
-}));
-timeOptions.unshift({ value: "30min", label: "30min" });
-
-interface TemplateMessagesProps {
-  onSendMessage: (message: string) => void;
-}
+//============================================================================
 
 export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
-  const [selectedTime, setSelectedTime] = useState<string>("15min");
+  const [selectedTime, setSelectedTime] = useState<string>("15min"); // Request time
 
+  // -------------------- confirmation template request ---------------------
   const handleTemplateClick = (template: TemplateMessage) => {
     let message = template.text;
     if (template.needsTime) {
@@ -76,8 +23,6 @@ export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
     }
     onSendMessage(message);
   };
-
-  const quickTimeOptions = ["30min", "1h", "4h", "11h"];
 
   return (
     <div className="h-full max-w-full flex flex-col px-4 pt-3 space-y-2 ">
@@ -122,6 +67,7 @@ export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
       </div>
 
       <h3 className="text-base font-semibold text-foreground mb-2">Driver Request Templates</h3>
+      
       {/* Compact Template Message Buttons */}
       <div className="flex-1 space-y-2 overflow-y-auto ">
         <div className="space-y-2 w-full">
