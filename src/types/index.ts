@@ -1,10 +1,7 @@
 export interface DriverRequest {
-  id: string;
   request: string;
   timestamp: Date;
-  status: 'sent' | 'acknowledged' | 'completed';
-  response?: string;
-  responseTimestamp?: Date;
+  sender: 'driver' | 'dispatcher';
 }
 
 export interface TemplateMessage {
@@ -25,7 +22,6 @@ export interface CustomMessageInputProps {
 }
 
 export interface ChatMessage {
-  id: string;
   text: string;
   timestamp: Date;
   sender: 'driver' | 'dispatch';

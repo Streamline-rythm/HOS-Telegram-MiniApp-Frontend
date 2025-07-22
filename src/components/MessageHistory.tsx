@@ -21,8 +21,7 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
 
   requests.forEach(request => {
     // ----------------- Add driver request message ---------------
-    chatMessages.push({
-      id: `${request.id}-request`,
+    request.sender == 'driver' && chatMessages.push({
       text: request.request,
       timestamp: request.timestamp,
       sender: 'driver',
@@ -30,15 +29,13 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
     });
 
     // ---------------- Add dispatch response if exists -----------
-    if (request.status === 'acknowledged' && request.response) {
-      chatMessages.push({
-        id: `${request.id}-response`,
-        text: request.response,
-        timestamp: request.responseTimestamp,
+   request.sender == 'dispatcher' && chatMessages.push({
+        text: request.request,
+        timestamp: request.timestamp,
         sender: 'dispatch',
         type: 'response'
       });
-    }
+    
   });
 
   // ----------------- Sort by timestamp ------------------------
@@ -73,9 +70,9 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
           </div>
         ) : (
           <>
-            {chatMessages.map((message) => (
+            {chatMessages.map((message, index) => (
               <div
-                key={message.id}
+                key={index}
                 className={`flex gap-3 animate-slide-up ${message.sender === 'driver' ? 'justify-end' : 'justify-start'
                   }`}
               >

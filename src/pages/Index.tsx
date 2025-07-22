@@ -20,7 +20,30 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("templates"); // Switching tabs flag
   const [userId, setUserId] = useState<number>(); // User telegram Id
   const socketRef = useRef(null);
-  
+
+  const handleAllHistory = (allHistory: any[]) => {
+    const cache = [];
+    allHistory.forEach(each => {
+      const newRequest: DriverRequest = {
+        request: each.content,
+        timestamp: each.created_at,
+        sender: "driver",
+      };
+      cache.push(newRequest);
+
+      if (each.replies) {
+        const newResponse: DriverRequest = {
+          request: each.replies.reply_content,
+          timestamp: each.replies.reply_at,
+          sender: 'dispatcher',
+        };
+        cache.push(newResponse);
+      }
+    });
+
+    setRequests(cache);
+  }
+
   //----------------------at the first render -------------------------
   useEffect(() => {
     //-------------------- Getting user telegram Id ------------------------------
@@ -30,26 +53,40 @@ const Index = () => {
         setUserId(user.id);
       } else {
         console.warn("User info not available.");
-        }
-      } else {
-        console.error("Telegram WebApp not available.");
       }
+    } else {
+      console.error("Telegram WebApp not available.");
+    }
 
     //------------------- fetching chatting history -----------------------------
-    // if (userId) {
-    //   fetch(`http://localhost:8000/messages?userId=${userId}`)
-    //   .then(res => {
-    //     if (!res.ok) throw new Error('Network response was not ok');
-    //     return res.json();
-    //   })
-    //   .then(data => setRequests(data))
-    //   .catch(err => console.log(err.message));
-    // }
-    
-  //-------------------- socket connection -------------------------------------
-    socketRef.current = io('http://localhost:8000'); 
+    if (userId) {
+      fetch(`http://localhost:8000/messages?userId=${userId}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+      })
+      .then(data => handleAllHistory(data))
+      .catch(err => console.log(err.message));
+    }
 
-    return () => { socketRef.current.disconnect(); }; 
+    //-------------------- socket connection -------------------------------------
+    socketRef.current = io('http://localhost:8000');
+
+    //-------------------- Listen replied message --------------------------------
+    if (!socketRef.current) return;
+    socketRef.current.on('reply', (reply: { messageId: number, reply: string }) => {
+      const newRequest: DriverRequest = {
+        request: reply.reply,
+        timestamp: new Date(),
+        sender: "dispatcher",
+      };
+
+      setRequests(prev => [...prev, newRequest]);
+      setActiveTab("status");
+
+    });
+
+    return () => { socketRef.current.disconnect(); };
   }, []);
 
 
@@ -57,10 +94,9 @@ const Index = () => {
   const handleSendRequest = (requestText: string) => {
     //-------------------- store message to chating history ----------------------
     const newRequest: DriverRequest = {
-      id: Date.now().toString(),
       request: requestText,
       timestamp: new Date(),
-      status: 'sent'
+      sender: "driver",
     };
 
     setRequests(prev => [...prev, newRequest]);
@@ -68,14 +104,14 @@ const Index = () => {
 
     //------------------- sending message part -----------------------------------
     if (!userId) {
-          alert('Please enter your userId before sending messages.');
-          return;
-        }
-        if (!requestText) return;
-        socketRef.current.emit('chat message', {
-          userId,
-          content: requestText,
-        });
+      alert('Please enter your userId before sending messages.');
+      return;
+    }
+    if (!requestText) return;
+    socketRef.current.emit('chat message', {
+      userId,
+      content: requestText,
+    });
   };
 
 
@@ -101,7 +137,7 @@ const Index = () => {
                 <p className="text-sm opacity-85">Smart AI Communication</p>
               </div>
             </div>
-              <ThemeToggle />
+            <ThemeToggle />
           </div>
         </div>
 
