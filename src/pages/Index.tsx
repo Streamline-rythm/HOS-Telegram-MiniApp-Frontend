@@ -39,17 +39,12 @@ const Index = () => {
       body: JSON.stringify({ telegramId: userId })
     }).then(res => {
       if (!res.ok) {
-        webApp.showAlert("❌ Unauthorized access.");
-        setTimeout(() => {
-          webApp.close();
-        }, 100);
+        webApp.showAlert("❌ Unauthorized access.", () => {webApp.close();});
       }
     }).catch(err => {
       console.error("Error verifying user:", err);
-      webApp.showAlert("❌ Something went wrong. Please try again.");
-      setTimeout(() => {
-        webApp.close();
-      }, 100);});
+      webApp.showAlert("❌ Something went wrong. Please try again.", () => {webApp.close()});}
+    )
     };
 
     // -------------------- Arrange chatting history --------------------
