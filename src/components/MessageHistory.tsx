@@ -23,7 +23,7 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
     // ----------------- Add driver request message ---------------
     request.sender == 'driver' && chatMessages.push({
       text: request.request,
-      timestamp: request.timestamp,
+      timestamp: typeof request.timestamp === 'string' ? new Date(request.timestamp.replace(" ", "T")) : request.timestamp,
       sender: 'driver',
       type: 'request'
     });
@@ -31,7 +31,7 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
     // ---------------- Add dispatch response if exists -----------
    request.sender == 'dispatcher' && chatMessages.push({
         text: request.request,
-        timestamp: request.timestamp,
+        timestamp: typeof request.timestamp === 'string' ? new Date(request.timestamp.replace(" ", "T")) : request.timestamp,
         sender: 'dispatch',
         type: 'response'
       });
