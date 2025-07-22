@@ -22,7 +22,35 @@ const Index = () => {
   const [userId, setUserId] = useState<number>(); // User telegram Id
   const [isLoading, setIsLoading] = useState<Boolean>(false);
   const socketRef = useRef(null);
+  const basicUrl = "http://localhost:8000";
 
+  // -------------------- Verify if user is member or not -------------
+
+  const verifyUser = (userId: number) => {
+    const webApp =  window.Telegram.WebApp as any;
+    if (typeof window.Telegram === 'undefined' || !window.Telegram.WebApp) {
+      alert("❌ Telegram WebApp is not available. Please open this Mini App from Telegram.");
+      return;
+    }
+  
+    fetch(`${basicUrl}/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telegramId: userId })
+    }).then(res => {
+      if (!res.ok) {
+        webApp.showAlert("❌ You are not authorized to use this service.");
+        webApp.close(); // Optionally close the Mini App
+      }
+    }).catch(err => {
+      console.error("Error verifying user:", err);
+      webApp.showAlert("❌ Something went wrong. Please try again later.");
+      webApp.close();
+    });
+  };
+  
+
+  // -------------------- Arrange chatting history --------------------
   const handleAllHistory = (allHistory: any[]) => {
     const cache: DriverRequest[] = [];
     allHistory.forEach(each => {
@@ -64,9 +92,11 @@ const Index = () => {
       console.error("Telegram WebApp not available.");
     }
 
+    verifyUser(user);
+
     //------------------- fetching chatting history -----------------------------
     if (user) {
-      fetch(`http://localhost:8000/messages?userId=${user.id}`)
+      fetch(`${basicUrl}/messages?userId=${user.id}`)
         .then(res => {
           if (!res.ok) throw new Error('Network response was not ok');
           return res.json();
@@ -76,7 +106,7 @@ const Index = () => {
     }
 
     //-------------------- socket connection -------------------------------------
-    socketRef.current = io('http://localhost:8000');
+    socketRef.current = io(`${basicUrl}`);
 
     //-------------------- Listen replied message --------------------------------
     if (!socketRef.current) return;
@@ -125,14 +155,36 @@ const Index = () => {
 
   if (isLoading) {
     return (
-      <div className="flex gap-3 justify-start">
-        <div className="flex-shrink-0">
-          <Skeleton className="w-8 h-8 rounded-full" />
+      <div className="h-screen bg-background flex flex-col">
+        {/* Header Skeleton */}
+        <div className="bg-gradient-primary text-primary-foreground p-4 shadow-soft flex-shrink-0">
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            </div>
+            <Skeleton className="w-8 h-8 rounded-md" />
+          </div>
         </div>
-        <div className="max-w-xs lg:max-w-md space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-3 w-16" />
+
+        {/* Main Content Skeleton */}
+        <div className="flex-1 flex flex-col min-h-0 mx-4">
+          <div className="mt-4 space-y-4">
+            <Skeleton className="h-10 w-full rounded-md" />
+            <div className="space-y-3">
+              <Skeleton className="h-20 w-full rounded-lg" />
+              <Skeleton className="h-20 w-full rounded-lg" />
+              <Skeleton className="h-20 w-full rounded-lg" />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Input Skeleton */}
+        <div className="border-t bg-card p-4 mx-4 mb-4 mt-3 rounded-lg shadow-soft flex-shrink-0">
+          <Skeleton className="h-10 w-full rounded-md" />
         </div>
       </div>
     )
