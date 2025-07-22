@@ -50,6 +50,7 @@ const Index = () => {
   //----------------------at the first render -------------------------
   useEffect(() => {
     setIsLoading(true);
+    console.log("loading start");
     //-------------------- Getting user telegram Id ------------------------------
     let user;
     if (window.Telegram.WebApp) {
@@ -90,7 +91,9 @@ const Index = () => {
       setActiveTab("status");
 
     });
+
     setIsLoading(false);
+    console.log("loading end");
 
     return () => { socketRef.current.disconnect(); };
   }, []);
