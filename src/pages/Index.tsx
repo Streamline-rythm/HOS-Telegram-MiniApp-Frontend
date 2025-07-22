@@ -22,14 +22,14 @@ const Index = () => {
   const socketRef = useRef(null);
 
   const handleAllHistory = (allHistory: any[]) => {
-    const cache = [];
+    let cache: DriverRequest[] = [];
     allHistory.forEach(each => {
       const newRequest: DriverRequest = {
         request: each.content,
         timestamp: each.created_at,
         sender: "driver",
       };
-      cache.push(newRequest);
+      cache = [...cache, newRequest];
 
       if (each.replies) {
         each.replies.forEach(item => {
@@ -38,7 +38,7 @@ const Index = () => {
             timestamp: item.reply_at,
             sender: 'dispatcher',
           };
-          cache.push(newResponse);
+          cache = [...cache, newResponse];
         })
       }
     });
