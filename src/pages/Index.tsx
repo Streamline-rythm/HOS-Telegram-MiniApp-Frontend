@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"; // Import react hook
 import { io } from 'socket.io-client'; // Import socket for real-time chatting
 
 // ---------------------- Import Component of UI -------------------------
+import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { RequestStatus } from "@/components/MessageHistory";
 import { TemplateMessages } from "@/components/TemplateMessages";
@@ -19,6 +20,7 @@ const Index = () => {
   const [requests, setRequests] = useState<DriverRequest[]>([]); // Requests history
   const [activeTab, setActiveTab] = useState("templates"); // Switching tabs flag
   const [userId, setUserId] = useState<number>(); // User telegram Id
+  const [isLoading, setIsLoading] = useState<Boolean>(false);
   const socketRef = useRef(null);
 
   const handleAllHistory = (allHistory: any[]) => {
@@ -47,6 +49,7 @@ const Index = () => {
 
   //----------------------at the first render -------------------------
   useEffect(() => {
+    setIsLoading(true);
     //-------------------- Getting user telegram Id ------------------------------
     let user;
     if (window.Telegram.WebApp) {
@@ -87,6 +90,7 @@ const Index = () => {
       setActiveTab("status");
 
     });
+    setIsLoading(false);
 
     return () => { socketRef.current.disconnect(); };
   }, []);
@@ -116,6 +120,18 @@ const Index = () => {
     });
   };
 
+  {isLoading && (
+    <div className="flex gap-3 justify-start">
+      <div className="flex-shrink-0">
+        <Skeleton className="w-8 h-8 rounded-full" />
+      </div>
+      <div className="max-w-xs lg:max-w-md space-y-2">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-3 w-16" />
+      </div>
+    </div>
+  )}
 
   return (
     <div className="h-screen flex flex-col justify-center items-center bg-gray-900">
