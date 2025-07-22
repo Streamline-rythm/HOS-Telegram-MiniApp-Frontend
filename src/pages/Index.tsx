@@ -22,27 +22,27 @@ const Index = () => {
   const socketRef = useRef(null);
 
   const handleAllHistory = (allHistory: any[]) => {
-    let cache: DriverRequest[] = [];
+    const cache: DriverRequest[] = [];
     allHistory.forEach(each => {
       const newRequest: DriverRequest = {
         request: each.content,
         timestamp: each.created_at,
         sender: "driver",
       };
-      cache = [...cache, newRequest];
+      cache.push(newRequest);
 
-      if (each.replies) {
+      if (each.replies && Array.isArray(each.replies)) {
         each.replies.forEach(item => {
           const newResponse: DriverRequest = {
             request: item.reply_content,
             timestamp: item.reply_at,
             sender: 'dispatcher',
           };
-          cache = [...cache, newResponse];
+          cache.push(newResponse);
         })
       }
     });
-    console.log(`allHistory= ${cache[0]}`);
+    console.log("allHistory=", cache[0]);
   }
 
   //----------------------at the first render -------------------------
