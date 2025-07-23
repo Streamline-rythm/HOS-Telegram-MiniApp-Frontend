@@ -27,7 +27,7 @@ const Index = () => {
   const [requests, setRequests] = useState<DriverRequest[]>([]); // Requests history
 
   // -------------------- Verify if user is member or not -------------
-  const verifyUser = (userId) => {
+  const verifyUser = (username) => {
     if (typeof window.Telegram === 'undefined' || !window.Telegram.WebApp) {
       alert("❌ Telegram WebApp is not available. Please open this Mini App from Telegram.");
       return;
@@ -38,7 +38,7 @@ const Index = () => {
         'Content-Type': 'application/json',
         // "ngrok-skip-browser-warning": "69420"
       },
-      body: JSON.stringify({ telegramId: userId })
+      body: JSON.stringify({ telegramId: username })
     }).then(res => {
       if (!res.ok) {
         webApp.showAlert("❌ Unauthorized access.", () => { webApp.close(); });
@@ -91,9 +91,9 @@ const Index = () => {
   }
 
   //---------------------- Fetch all chat history --------------------
-  const getAllChatHistory = (userId) => {
-    if (userId) {
-      fetch(`${basicUrl}/messages?userId=${userId}`, {
+  const getAllChatHistory = (username) => {
+    if (username) {
+      fetch(`${basicUrl}/messages?userId=${username}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -113,9 +113,9 @@ const Index = () => {
   //----------------------At the first render -------------------------
   useEffect(() => {
     setIsLoading(true);
-    const userId = getTelegramUserInformation();
-    verifyUser(userId);
-    getAllChatHistory(userId);
+    const username = getTelegramUserInformation();
+    verifyUser(username);
+    getAllChatHistory(username);
 
     //-------------------- socket connection -------------------------------------
     socketRef.current = io(`${basicUrl}`);
