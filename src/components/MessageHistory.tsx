@@ -20,6 +20,7 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
   const chatMessages: ChatMessage[] = [];
 
   requests.forEach(request => {
+    
     // ----------------- Add driver request message ---------------
     request.sender == 'driver' && chatMessages.push({
       text: request.request,
