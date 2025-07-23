@@ -118,12 +118,7 @@ const Index = () => {
     getAllChatHistory(user);
 
     //-------------------- socket connection -------------------------------------
-    socketRef.current = io(`${basicUrl}`, {
-      transports: ['websocket'],
-      extraHeaders: {
-        'ngrok-skip-browser-warning': '1',
-      },
-    })
+    socketRef.current = io(`${basicUrl}`);
 
     //-------------------- Listen replied message --------------------------------
     if (!socketRef.current) return;
