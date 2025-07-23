@@ -27,7 +27,7 @@ const Index = () => {
   const [requests, setRequests] = useState<DriverRequest[]>([]); // Requests history
 
   // -------------------- Verify if user is member or not -------------
-  const verifyUser = () => {
+  const verifyUser = (userId) => {
     if (typeof window.Telegram === 'undefined' || !window.Telegram.WebApp) {
       alert("❌ Telegram WebApp is not available. Please open this Mini App from Telegram.");
       return;
@@ -90,7 +90,7 @@ const Index = () => {
   }
 
   //---------------------- Fetch all chat history --------------------
-  const getAllChatHistory = () => {
+  const getAllChatHistory = (userId) => {
     if (userId) {
       fetch(`${basicUrl}/messages?userId=${userId}`, {
         method: 'GET',
@@ -113,8 +113,8 @@ const Index = () => {
   useEffect(() => {
     setIsLoading(true);
     getTelegramUserInformation();
-    verifyUser();
-    getAllChatHistory();
+    verifyUser(userId);
+    getAllChatHistory(userId);
 
     //-------------------- socket connection -------------------------------------
     socketRef.current = io(`${basicUrl}`);
