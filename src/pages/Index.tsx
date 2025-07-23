@@ -81,6 +81,7 @@ const Index = () => {
       const user = webApp.initDataUnsafe?.user;
       if (user) {
         setUserId(user.username);
+        return user.username
       } else {
         webApp.showAlert("❌ User info not available", () => { webApp.close(); });
       }
@@ -112,7 +113,7 @@ const Index = () => {
   //----------------------At the first render -------------------------
   useEffect(() => {
     setIsLoading(true);
-    getTelegramUserInformation();
+    const userId = getTelegramUserInformation();
     verifyUser(userId);
     getAllChatHistory(userId);
 
