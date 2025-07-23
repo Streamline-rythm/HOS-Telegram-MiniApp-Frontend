@@ -21,13 +21,13 @@ const Index = () => {
   const basicUrl = "https://hos.run.place";
   const webApp = window.Telegram.WebApp as any || null;
 
-  const [userId, setUserId] = useState<number>(); // User telegram Id
+  const [userId, setUserId] = useState<string>(); // User telegram Id
   const [activeTab, setActiveTab] = useState("templates"); // Switching tabs flag
   const [isLoading, setIsLoading] = useState<Boolean>(false); // Rendering page flag
   const [requests, setRequests] = useState<DriverRequest[]>([]); // Requests history
 
   // -------------------- Verify if user is member or not -------------
-  const verifyUser = (user) => {
+  const verifyUser = () => {
     if (typeof window.Telegram === 'undefined' || !window.Telegram.WebApp) {
       alert("❌ Telegram WebApp is not available. Please open this Mini App from Telegram.");
       return;
@@ -36,9 +36,9 @@ const Index = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        "ngrok-skip-browser-warning": "69420"
+        // "ngrok-skip-browser-warning": "69420"
       },
-      body: JSON.stringify({ telegramId: user.username })
+      body: JSON.stringify({ telegramId: userId })
     }).then(res => {
       if (!res.ok) {
         webApp.showAlert("❌ Unauthorized access.", () => { webApp.close(); });
@@ -80,8 +80,7 @@ const Index = () => {
     if (webApp) {
       const user = webApp.initDataUnsafe?.user;
       if (user) {
-        setUserId(user.id);
-        return user;
+        setUserId(user.username);
       } else {
         webApp.showAlert("❌ User info not available", () => { webApp.close(); });
       }
@@ -91,13 +90,13 @@ const Index = () => {
   }
 
   //---------------------- Fetch all chat history --------------------
-  const getAllChatHistory = (user) => {
-    if (user) {
-      fetch(`${basicUrl}/messages?userId=${user.id}`, {
+  const getAllChatHistory = () => {
+    if (userId) {
+      fetch(`${basicUrl}/messages?userId=${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': '69420'
+          // 'ngrok-skip-browser-warning': '69420'
         }
       })
         .then(res => {
@@ -113,9 +112,9 @@ const Index = () => {
   //----------------------At the first render -------------------------
   useEffect(() => {
     setIsLoading(true);
-    const user = getTelegramUserInformation();
-    verifyUser(user);
-    getAllChatHistory(user);
+    getTelegramUserInformation();
+    verifyUser();
+    getAllChatHistory();
 
     //-------------------- socket connection -------------------------------------
     socketRef.current = io(`${basicUrl}`);
