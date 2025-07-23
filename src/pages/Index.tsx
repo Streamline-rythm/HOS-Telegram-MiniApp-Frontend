@@ -18,7 +18,7 @@ import { Activity, Truck } from "lucide-react";
 // =============================================================================
 const Index = () => {
   const socketRef = useRef(null);
-  const basicUrl = "http://localhost:8000";
+  const basicUrl = "http://34.57.132.70:8000";
   const webApp = window.Telegram.WebApp as any || null;
 
   const [userId, setUserId] = useState<number>(); // User telegram Id
