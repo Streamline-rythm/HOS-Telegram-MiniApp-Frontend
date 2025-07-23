@@ -37,7 +37,7 @@ const Index = () => {
     fetch(`${basicUrl}/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ telegramId: userId })
+      body: JSON.stringify({ telegramId: username })
     }).then(res => {
       if (!res.ok) {
         webApp.showAlert("❌ Unauthorized access.", () => {webApp.close();});
