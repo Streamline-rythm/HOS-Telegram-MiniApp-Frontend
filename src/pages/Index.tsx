@@ -27,6 +27,7 @@ const Index = () => {
   // -------------------- Verify if user is member or not -------------
 
   const verifyUser = (username: string) => {
+    console.log("username=", username);
     const webApp = window.Telegram.WebApp as any;
     if (typeof window.Telegram === 'undefined' || !window.Telegram.WebApp) {
       alert("❌ Telegram WebApp is not available. Please open this Mini App from Telegram.");
