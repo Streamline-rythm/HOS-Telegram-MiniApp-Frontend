@@ -34,7 +34,10 @@ const Index = () => {
     }
     fetch(`${basicUrl}/verify`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        "ngrok-skip-browser-warning": "69420"
+      },
       body: JSON.stringify({ telegramId: user.username })
     }).then(res => {
       if (!res.ok) {
@@ -90,7 +93,13 @@ const Index = () => {
   //---------------------- Fetch all chat history --------------------
   const getAllChatHistory = (user) => {
     if (user) {
-      fetch(`${basicUrl}/messages?userId=${user.id}`)
+      fetch(`${basicUrl}/messages?userId=${user.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': '69420'
+        }
+      })
         .then(res => {
           if (!res.ok) throw new Error('Network response was not ok');
           return res.json();
@@ -98,6 +107,7 @@ const Index = () => {
         .then(data => handleAllHistory(data))
         .catch(err => console.log(err.message));
     }
+    
   }
 
   //----------------------At the first render -------------------------
