@@ -18,7 +18,7 @@ import { Activity, Truck } from "lucide-react";
 // =============================================================================
 const Index = () => {
   const socketRef = useRef(null);
-  const basicUrl = "https://905315997c59.ngrok-free.app";
+  const basicUrl = "https://hos.run.place";
   const webApp = window.Telegram.WebApp as any || null;
 
   const [userId, setUserId] = useState<number>(); // User telegram Id
@@ -107,7 +107,7 @@ const Index = () => {
         .then(data => handleAllHistory(data))
         .catch(err => console.log(err.message));
     }
-    
+
   }
 
   //----------------------At the first render -------------------------
@@ -118,7 +118,12 @@ const Index = () => {
     getAllChatHistory(user);
 
     //-------------------- socket connection -------------------------------------
-    socketRef.current = io(`${basicUrl}`);
+    socketRef.current = io(`${basicUrl}`, {
+      transports: ['websocket'],
+      extraHeaders: {
+        'ngrok-skip-browser-warning': '1',
+      },
+    })
 
     //-------------------- Listen replied message --------------------------------
     if (!socketRef.current) return;
