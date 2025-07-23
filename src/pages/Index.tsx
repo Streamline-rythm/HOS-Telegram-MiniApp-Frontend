@@ -26,7 +26,7 @@ const Index = () => {
 
   // -------------------- Verify if user is member or not -------------
 
-  const verifyUser = (userId: number) => {
+  const verifyUser = (username: string) => {
     const webApp = window.Telegram.WebApp as any;
     if (typeof window.Telegram === 'undefined' || !window.Telegram.WebApp) {
       alert("❌ Telegram WebApp is not available. Please open this Mini App from Telegram.");
@@ -36,7 +36,7 @@ const Index = () => {
     fetch(`${basicUrl}/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ telegramId: userId })
+      body: JSON.stringify({ telegramId: username })
     }).then(res => {
       if (!res.ok) {
         webApp.showAlert("❌ Unauthorized access.", () => {webApp.close();});
@@ -89,7 +89,7 @@ const Index = () => {
         console.error("Telegram WebApp not available.");
       }
 
-      verifyUser(user);
+      verifyUser(user.username);
 
       //------------------- fetching chatting history -----------------------------
       if (user) {
