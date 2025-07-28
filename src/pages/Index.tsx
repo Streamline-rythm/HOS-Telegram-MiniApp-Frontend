@@ -115,11 +115,10 @@ const Index = () => {
     setIsLoading(true);
     const username = getTelegramUserInformation();
     verifyUser(username);
-    getAllChatHistory(username);
-
+    
     //-------------------- socket connection -------------------------------------
     socketRef.current = io(`${basicUrl}`);
-
+    
     //-------------------- Listen replied message --------------------------------
     if (!socketRef.current) return;
     socketRef.current.on('reply', (reply: { messageId: number, reply: string }) => {
@@ -131,6 +130,12 @@ const Index = () => {
       setRequests(prev => [...prev, newRequest]);
       setActiveTab("status");
     });
+
+    socketRef.current.emit('socket register', {
+      userId,
+    });
+
+    getAllChatHistory(username);
     setIsLoading(false);
 
     return () => { socketRef.current.disconnect(); };
