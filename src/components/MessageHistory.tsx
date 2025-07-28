@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"; // Import react hook
 
 // ---------------------- Import types, constants, avatar and icons ----------
-import { MessageCircle, Clock, User, Truck } from "lucide-react"; 
+import { MessageCircle, Clock, User, Truck } from "lucide-react";
 import { ChatMessage, ChatHistoryProps } from "@/types";
 
 export function RequestStatus({ requests }: ChatHistoryProps) {
@@ -20,7 +20,7 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
   const chatMessages: ChatMessage[] = [];
 
   requests.forEach(request => {
-    
+
     // ----------------- Add driver request message ---------------
     request.sender == 'driver' && chatMessages.push({
       text: request.request,
@@ -30,13 +30,13 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
     });
 
     // ---------------- Add dispatch response if exists -----------
-   request.sender == 'dispatcher' && chatMessages.push({
-        text: request.request,
-        timestamp: typeof request.timestamp === 'string' ? new Date(request.timestamp.replace(" ", "T")) : request.timestamp,
-        sender: 'dispatch',
-        type: 'response'
-      });
-    
+    request.sender == 'dispatcher' && chatMessages.push({
+      text: request.request,
+      timestamp: typeof request.timestamp === 'string' ? new Date(request.timestamp.replace(" ", "T")) : request.timestamp,
+      sender: 'dispatch',
+      type: 'response'
+    });
+
   });
 
   // ----------------- Sort by timestamp ------------------------
@@ -87,11 +87,13 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
 
                 <div
                   className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-soft ${message.sender === 'driver'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-card border border-border'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-card border border-border'
                     }`}
                 >
-                  <p className="text-sm">{message.text}</p>
+                  {message.text.split('\n').map((line, index) => (
+                    <p key={index} className="text-sm">{line}</p>
+                  ))}
                   <div className="flex items-center gap-1 mt-2 opacity-70">
                     <Clock size={12} />
                     <span className="text-xs">{formatTime(message.timestamp)}</span>
