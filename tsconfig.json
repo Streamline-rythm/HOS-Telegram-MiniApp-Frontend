@@ -15,5 +15,9 @@
     "allowJs": true,
     "noUnusedLocals": false,
     "strictNullChecks": false
-  }
+  },
+  
+  "include": ["src", "telegram.d.ts", "src/telegram.d.ts"]
+
+
 }
