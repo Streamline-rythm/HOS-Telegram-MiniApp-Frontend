@@ -113,7 +113,7 @@ const Index = () => {
 
       socketRef.current.on("connect", () => {
         console.log("✅ Socket connected:", socketRef.current?.id);
-        socketRef.current?.emit('socket register', { username });
+        socketRef.current?.emit('socket register', { userId: username });
       });
 
       socketRef.current.on("disconnect", () => {
