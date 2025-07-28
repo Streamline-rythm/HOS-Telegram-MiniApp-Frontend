@@ -5,21 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 // ---------------------- Import types, constants, avatar and icons ----------
-import { Send, MessageSquare } from "lucide-react";
+import { Send, MessageSquare, WifiOff } from "lucide-react";
 import { CustomMessageInputProps } from "@/types";
 
-export function CustomMessageInput({ onSendMessage }: CustomMessageInputProps) {
+export function CustomMessageInput({ onSendMessage, disabled = false }: CustomMessageInputProps) {
   const [message, setMessage] = useState("");
 
   const handleSend = () => {
-    if (message.trim()) {
+    if (message.trim() && !disabled) {
       onSendMessage(message.trim());
       setMessage("");
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !disabled) {
       e.preventDefault();
       handleSend();
     }
@@ -27,19 +27,25 @@ export function CustomMessageInput({ onSendMessage }: CustomMessageInputProps) {
 
   return (
     <div className="flex gap-2 items-center">
-      <MessageSquare size={16} className="text-muted-foreground" />
+      {disabled ? (
+        <WifiOff size={16} className="text-muted-foreground" />
+      ) : (
+        <MessageSquare size={16} className="text-muted-foreground" />
+      )}
       <Input
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyPress={handleKeyPress}
-        placeholder="Custom message (optional)..."
+        placeholder={disabled ? "Offline - Cannot send messages" : "Custom message (optional)..."}
         className="flex-1 text-sm"
+        disabled={disabled}
       />
       <Button
         onClick={handleSend}
-        disabled={!message.trim()}
+        disabled={!message.trim() || disabled}
         variant="minimal"
         size="sm"
+        title={disabled ? "You are offline" : "Send message"}
       >
         <Send size={14} />
       </Button>

@@ -73,7 +73,7 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
           <>
             {chatMessages.map((message, index) => (
               <div
-                key={index}
+                key={`${message.sender}-${index}-${message.timestamp.getTime()}`}
                 className={`flex gap-3 animate-slide-up ${message.sender === 'driver' ? 'justify-end' : 'justify-start'
                   }`}
               >
@@ -91,8 +91,8 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
                     : 'bg-card border border-border'
                     }`}
                 > 
-                  {message.text.split('*#').map((line, index) => (
-                    <p key={index} className="text-sm">{line}</p>
+                  {message.text.split('*#').map((line, lineIndex) => (
+                    <p key={lineIndex} className="text-sm whitespace-pre-wrap">{line}</p>
                   ))}
                   <div className="flex items-center gap-1 mt-2 opacity-70">
                     <Clock size={12} />
