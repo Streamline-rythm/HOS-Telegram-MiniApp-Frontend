@@ -19,7 +19,6 @@ export interface TemplateMessagesProps {
 
 export interface CustomMessageInputProps {
   onSendMessage: (message: string) => void;
-  disabled?: boolean;
 }
 
 export interface ChatMessage {
