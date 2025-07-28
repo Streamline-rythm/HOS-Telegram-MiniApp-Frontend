@@ -90,8 +90,8 @@ export function RequestStatus({ requests }: ChatHistoryProps) {
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-card border border-border'
                     }`}
-                >
-                  {message.text.split('\n').map((line, index) => (
+                > 
+                  {message.text.split('*#').map((line, index) => (
                     <p key={index} className="text-sm">{line}</p>
                   ))}
                   <div className="flex items-center gap-1 mt-2 opacity-70">
