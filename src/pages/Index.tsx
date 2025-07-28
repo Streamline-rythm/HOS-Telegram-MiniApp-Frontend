@@ -22,22 +22,6 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [requests, setRequests] = useState<DriverRequest[]>([]);
 
-  // -------------------- Fetch Telegram User Info --------------------
-  const getTelegramUserInformation = (): string | undefined => {
-    if (!webApp) {
-      alert("❌ Telegram WebApp not available.");
-      webApp?.close?.();
-      return;
-    }
-
-    const user = webApp.initDataUnsafe?.user;
-    if (user?.username) {
-      return user.username;
-    } else {
-      webApp.showAlert("❌ User info not available", () => webApp.close());
-    }
-  };
-
   // -------------------- Verify Telegram User --------------------
   const verifyUser = async (username: string) => {
     try {
@@ -98,13 +82,29 @@ const Index = () => {
   // -------------------- Initial App Load --------------------
   useEffect(() => {
     const init = async () => {
+      if (!window.Telegram?.WebApp) {
+        alert("❌ Telegram WebApp not available.");
+        return;
+      }
+
+      window.Telegram.WebApp.ready();
+
       setIsLoading(true);
 
-      const username = getTelegramUserInformation();
-      if (!username) return;
+      const username = window.Telegram.WebApp.initDataUnsafe?.user?.username;
+      if (!username) {
+        window.Telegram.WebApp.showAlert("❌ User info not available", () => window.Telegram.WebApp.close());
+        return;
+      }
 
-      await verifyUser(username);
-      await getAllChatHistory(username);
+      try {
+        await verifyUser(username);
+        await getAllChatHistory(username);
+      } catch (err) {
+        console.error("Init error:", err);
+        window.Telegram.WebApp.showAlert("❌ Initialization failed", () => window.Telegram.WebApp.close());
+        return;
+      }
 
       socketRef.current = io(basicUrl, {
         transports: ['websocket'],
@@ -145,9 +145,15 @@ const Index = () => {
 
   // -------------------- Send Message --------------------
   const handleSendRequest = (requestText: string) => {
-    const username = getTelegramUserInformation();
+    const username = window.Telegram?.WebApp?.initDataUnsafe?.user?.username;
+
     if (!username || !requestText) {
-      webApp.showAlert("❌ Cannot send empty message or missing user.", () => webApp.close());
+      window.Telegram?.WebApp?.showAlert("❌ Cannot send empty message or missing user.", () => window.Telegram?.WebApp?.close());
+      return;
+    }
+
+    if (!socketRef.current?.connected) {
+      window.Telegram.WebApp.showAlert("❌ Socket is not connected. Try again.");
       return;
     }
 
@@ -160,7 +166,7 @@ const Index = () => {
     setRequests(prev => [...prev, newRequest]);
     setActiveTab("status");
 
-    socketRef.current?.emit('chat message', {
+    socketRef.current.emit('chat message', {
       userId: username,
       content: requestText,
     });
