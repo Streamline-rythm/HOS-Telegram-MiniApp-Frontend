@@ -146,7 +146,7 @@ const Index = () => {
       socketRef.current.on('chat message', (msg) => {
         try {
           if (!msg) return;
-
+          console.log("----------------------------", msg);
           const newRequest: DriverRequest = {
             request: msg.request,
             timestamp: formatTime(msg.timestamp),
