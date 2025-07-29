@@ -147,6 +147,14 @@ const Index = () => {
         return;
       }
 
+      try {
+        await getAllChatHistory(username);
+      } catch (err) {
+        console.error("❌ User verification failed:", err);
+        window.Telegram.WebApp.showAlert("❌ You are not authorized", () => window.Telegram.WebApp.close());
+        return;
+      }
+
       socket.on('reply', (reply: { messageId: number; reply: string; currentTime: string }) => {
         const newRequest: DriverRequest = {
           request: reply.reply,
