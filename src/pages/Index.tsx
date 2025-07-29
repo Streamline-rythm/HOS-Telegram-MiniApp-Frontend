@@ -82,14 +82,14 @@ const Index = () => {
   // -------------------- Initial App Load --------------------
   useEffect(() => {
     const init = async () => {
+      setIsLoading(true);
+
       if (!window.Telegram?.WebApp) {
         alert("❌ Telegram WebApp not available.");
         return;
       }
 
       window.Telegram.WebApp.ready();
-
-      setIsLoading(true);
 
       const username = window.Telegram.WebApp.initDataUnsafe?.user?.username;
       if (!username) {
@@ -98,14 +98,15 @@ const Index = () => {
       }
 
       try {
+        // ✅ Step 1: Verify user first
         await verifyUser(username);
-        await getAllChatHistory(username);
       } catch (err) {
-        console.error("Init error:", err);
-        window.Telegram.WebApp.showAlert("❌ Initialization failed", () => window.Telegram.WebApp.close());
+        console.error("❌ User verification failed:", err);
+        window.Telegram.WebApp.showAlert("❌ You are not authorized", () => window.Telegram.WebApp.close());
         return;
       }
 
+      // ✅ Step 2: Connect socket early — before loading history
       socketRef.current = io(basicUrl, {
         transports: ['websocket'],
         withCredentials: true,
@@ -130,6 +131,14 @@ const Index = () => {
         setActiveTab("status");
       });
 
+      try {
+        // ✅ Step 3: Load chat history after socket is ready
+        await getAllChatHistory(username);
+      } catch (err) {
+        console.error("⚠️ Failed to fetch chat history:", err);
+        // Not fatal — just log or show a warning if needed
+      }
+
       setIsLoading(false);
     };
 
@@ -142,6 +151,7 @@ const Index = () => {
       }
     };
   }, []);
+
 
   // -------------------- Send Message --------------------
   const handleSendRequest = (requestText: string) => {
