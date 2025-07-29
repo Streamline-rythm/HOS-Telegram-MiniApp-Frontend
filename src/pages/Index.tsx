@@ -143,24 +143,6 @@ const Index = () => {
         setActiveTab("status");
       });
 
-      socketRef.current.on('chat message', (msg) => {
-        try {
-          if (!msg) return;
-          console.log("----------------------------", msg);
-          const newRequest: DriverRequest = {
-            request: msg.request,
-            timestamp: formatTime(msg.timestamp),
-            sender: "driver",
-          };
-
-          setRequests(prev => [...prev, newRequest]);
-          setActiveTab("status");
-
-        } catch (err) {
-          console.log("Failed to receive sending message", err)
-        }
-      })
-
       try {
         // ✅ Step 3: Load chat history after socket is ready
         await getAllChatHistory(username);
@@ -200,7 +182,20 @@ const Index = () => {
     socketRef.current.emit('chat message', {
       userId: username,
       content: requestText,
-    });
+    }, (response) => {
+      if (response.success) {
+        const newRequest: DriverRequest = {
+          request: response.request,
+          timestamp: formatTime(response.timestamp),
+          sender: "driver",
+        };
+        setRequests(prev => [...prev, newRequest]);
+        setActiveTab("status");
+      } else {
+        console.log("Error:", response.error);
+      }
+    }
+    );
   };
 
   // -------------------- Loading UI --------------------
