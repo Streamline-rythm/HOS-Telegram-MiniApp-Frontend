@@ -133,10 +133,10 @@ const Index = () => {
         console.log("❌ Socket disconnected");
       });
 
-      socketRef.current.on('reply', (reply: { messageId: number; reply: string }) => {
+      socketRef.current.on('reply', (reply: { messageId: number; reply: string, currentTime: string }) => {
         const newRequest: DriverRequest = {
           request: reply.reply,
-          timestamp: new Date(),
+          timestamp: formatTime(reply.currentTime),
           sender: "dispatcher",
         };
         setRequests(prev => [...prev, newRequest]);
