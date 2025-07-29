@@ -110,7 +110,6 @@ const Index = () => {
       }
 
       try {
-        // ✅ Step 1: Verify user first
         await verifyUser(username);
       } catch (err) {
         console.error("❌ User verification failed:", err);
@@ -118,48 +117,57 @@ const Index = () => {
         return;
       }
 
-      // ✅ Step 2: Connect socket early — before loading history
-      socketRef.current = io(basicUrl, {
+      const socket = io(basicUrl, {
         transports: ['websocket'],
         withCredentials: true,
       });
 
-      socketRef.current.on("connect", () => {
-        console.log("✅ Socket connected:", socketRef.current?.id);
-        socketRef.current?.emit('socket register', { userId: username });
-      });
+      socketRef.current = socket;
 
-      socketRef.current.on("disconnect", () => {
+      socket.on("disconnect", () => {
         console.log("❌ Socket disconnected");
       });
 
-      socketRef.current.on('reply', (reply: { messageId: number; reply: string, currentTime: string }) => {
+      try {
+        await Promise.race([
+          new Promise<void>((resolve) => {
+            socket.on("connect", () => {
+              console.log("✅ Socket connected:", socket.id);
+              socket.emit('socket register', { userId: username });
+              resolve();
+            });
+          }),
+          new Promise<void>((_, reject) =>
+            setTimeout(() => reject(new Error("⏱️ Socket connection timed out")), 60000)
+          ),
+        ]);
+      } catch (err) {
+        console.error(err.message || err);
+        window.Telegram.WebApp.showAlert("❌ Failed to connect to server. Try again later.", () => window.Telegram.WebApp.close());
+        return;
+      }
+
+      socket.on('reply', (reply: { messageId: number; reply: string; currentTime: string }) => {
         const newRequest: DriverRequest = {
           request: reply.reply,
           timestamp: formatTime(reply.currentTime),
           sender: "dispatcher",
         };
-        setRequests(prev => [...prev, newRequest]);
+        setRequests((prev) => [...prev, newRequest]);
         setActiveTab("status");
       });
-
-      try {
-        // ✅ Step 3: Load chat history after socket is ready
-        await getAllChatHistory(username);
-      } catch (err) {
-        console.error("⚠️ Failed to fetch chat history:", err);
-        // Not fatal — just log or show a warning if needed
-      }
 
       setIsLoading(false);
     };
 
     init();
 
+    // Cleanup function to disconnect socket when component unmounts
     return () => {
       if (socketRef.current) {
-        console.log("🔌 Disconnecting socket...");
         socketRef.current.disconnect();
+        socketRef.current = null;
+        console.log("🧹 Socket disconnected on cleanup");
       }
     };
   }, []);
