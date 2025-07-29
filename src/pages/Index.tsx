@@ -63,6 +63,18 @@ const Index = () => {
     setRequests(cache);
   };
 
+  // -------------------- Convert UTCString To LocalString --------------------
+  const formatTime = (utcString: string) => {
+    const isoUtcString = utcString.replace(' ', 'T') + 'Z';
+    return new Date(isoUtcString);
+    // return new Date(utcString).toLocaleString('en-US', {
+    //   hour: '2-digit',
+    //   minute: '2-digit',
+    //   second: '2-digit',
+    //   hour12: true
+    // });
+  };
+
   // -------------------- Load Chat History --------------------
   const getAllChatHistory = async (username: string) => {
     try {
@@ -131,6 +143,24 @@ const Index = () => {
         setActiveTab("status");
       });
 
+      socketRef.current.on('chat message', (msg) => {
+        try {
+          if (!msg) return;
+
+          const newRequest: DriverRequest = {
+            request: msg.request,
+            timestamp: formatTime(msg.timestamp),
+            sender: "driver",
+          };
+
+          setRequests(prev => [...prev, newRequest]);
+          setActiveTab("status");
+
+        } catch (err) {
+          console.log("Failed to receive sending message", err)
+        }
+      })
+
       try {
         // ✅ Step 3: Load chat history after socket is ready
         await getAllChatHistory(username);
@@ -166,15 +196,6 @@ const Index = () => {
       window.Telegram.WebApp.showAlert("❌ Socket is not connected. Try again.");
       return;
     }
-
-    const newRequest: DriverRequest = {
-      request: requestText,
-      timestamp: new Date(),
-      sender: "driver",
-    };
-
-    setRequests(prev => [...prev, newRequest]);
-    setActiveTab("status");
 
     socketRef.current.emit('chat message', {
       userId: username,
