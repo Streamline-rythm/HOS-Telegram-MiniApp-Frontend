@@ -194,7 +194,7 @@ const Index = () => {
       window.Telegram.WebApp.showAlert("❌ Socket is not connected. Try again.");
       return;
     }
-
+    console.log("sending message with destination", requestText);
     socketRef.current.emit('chat message', {
       userId: username,
       content: requestText[0],
