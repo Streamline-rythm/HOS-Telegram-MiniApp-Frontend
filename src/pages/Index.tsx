@@ -182,11 +182,11 @@ const Index = () => {
 
 
   // -------------------- Send Message --------------------
-  const handleSendRequest = (requestText) => {
+  const handleSendRequest = (requestText, destination) => {
     const username = window.Telegram?.WebApp?.initDataUnsafe?.user?.username;
     
     console.log("sending message with destination", requestText);
-    if (!username || requestText.length != 0) {
+    if (!username || !requestText.trim()) {
       window.Telegram?.WebApp?.showAlert("❌ Cannot send empty message or missing user.", () => window.Telegram?.WebApp?.close());
       return;
     }
@@ -197,8 +197,8 @@ const Index = () => {
     }
     socketRef.current.emit('chat message', {
       userId: username,
-      content: requestText[0],
-      destination: requestText[1],
+      content: requestText,
+      destination: destination,
     }, (response) => {
       if (response.success) {
         const newRequest: DriverRequest = {
