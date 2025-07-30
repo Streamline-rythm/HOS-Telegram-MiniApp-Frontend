@@ -185,7 +185,7 @@ const Index = () => {
   const handleSendRequest = (requestText) => {
     const username = window.Telegram?.WebApp?.initDataUnsafe?.user?.username;
 
-    if (!username || requestText.length() != 0) {
+    if (!username || requestText.length != 0) {
       window.Telegram?.WebApp?.showAlert("❌ Cannot send empty message or missing user.", () => window.Telegram?.WebApp?.close());
       return;
     }
