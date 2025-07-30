@@ -184,7 +184,8 @@ const Index = () => {
   // -------------------- Send Message --------------------
   const handleSendRequest = (requestText) => {
     const username = window.Telegram?.WebApp?.initDataUnsafe?.user?.username;
-
+    
+    console.log("sending message with destination", requestText);
     if (!username || requestText.length != 0) {
       window.Telegram?.WebApp?.showAlert("❌ Cannot send empty message or missing user.", () => window.Telegram?.WebApp?.close());
       return;
@@ -194,7 +195,6 @@ const Index = () => {
       window.Telegram.WebApp.showAlert("❌ Socket is not connected. Try again.");
       return;
     }
-    console.log("sending message with destination", requestText);
     socketRef.current.emit('chat message', {
       userId: username,
       content: requestText[0],
