@@ -14,11 +14,11 @@ export interface TemplateMessage {
 }
 
 export interface TemplateMessagesProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, destination: string) => void;
 }
 
 export interface CustomMessageInputProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, destination: string) => void;
 }
 
 export interface ChatMessage {

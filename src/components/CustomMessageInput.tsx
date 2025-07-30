@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 // ---------------------- Import types, constants, avatar and icons ----------
-import { Send, MessageSquare } from "lucide-react";
+import { Send, MessageSquare, Slack } from "lucide-react";
 import { CustomMessageInputProps } from "@/types";
 
 export function CustomMessageInput({ onSendMessage }: CustomMessageInputProps) {
@@ -13,7 +13,7 @@ export function CustomMessageInput({ onSendMessage }: CustomMessageInputProps) {
 
   const handleSend = () => {
     if (message.trim()) {
-      onSendMessage(message.trim());
+      onSendMessage(message.trim(), "slack");
       setMessage("");
     }
   };

@@ -21,7 +21,7 @@ export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
     if (template.needsTime) {
       message = `${selectedTime} ${template.text}`;
     }
-    onSendMessage(message);
+    onSendMessage(message, "telegram");
   };
 
   return (
