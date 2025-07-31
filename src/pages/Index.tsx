@@ -15,7 +15,7 @@ import { Activity, Truck } from "lucide-react";
 // =============================================================================
 const Index = () => {
   const socketRef = useRef<Socket | null>(null);
-  const basicUrl = "https://hos-miniapp-backend-181509438418.us-central1.run.app";
+  const basicUrl = "https://hos-miniapp-slack-backend-181509438418.us-central1.run.app";
   const webApp = window.Telegram?.WebApp as any || null;
 
   const [activeTab, setActiveTab] = useState("templates");
