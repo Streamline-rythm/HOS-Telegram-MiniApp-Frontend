@@ -49,5 +49,6 @@ export const templates: TemplateMessage[] = [
     label: `${i + 1} hour${i === 0 ? '' : 's'}`,
   }));
   timeOptions.unshift({ value: "30min", label: "30min" });
+  timeOptions.unshift({ value: "15min", label: "15min" });
 
   export const quickTimeOptions = ["30min", "1h", "4h", "11h"];
