@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 // ---------------------- Import types, constants, avatar and icons ----------
 import { Send, MessageSquare, Slack } from "lucide-react";
 import { CustomMessageInputProps } from "@/types";
+import sendButton from '@/assets/send.png';
 
 export function CustomMessageInput({ onSendMessage }: CustomMessageInputProps) {
   const [message, setMessage] = useState("");
@@ -41,7 +42,12 @@ export function CustomMessageInput({ onSendMessage }: CustomMessageInputProps) {
         variant="minimal"
         size="sm"
       >
-        <Send size={14} />
+        <img
+          src={sendButton}
+          alt="sendButton"
+          className="w-[50px] h-[50px] rounded-full border-2 border-primary-border"
+        />
+        {/* <Send size={14} /> */}
       </Button>
     </div>
   );

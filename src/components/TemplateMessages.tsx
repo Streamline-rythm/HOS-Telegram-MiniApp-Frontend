@@ -11,7 +11,6 @@ import { TemplateMessage, TemplateMessagesProps } from "@/types";
 import { templates, timeOptions, quickTimeOptions } from "@/constant";
 
 import requestButton from '@/assets/request.png';
-import sendButton from '@/assets/send.png';
 
 //============================================================================
 
