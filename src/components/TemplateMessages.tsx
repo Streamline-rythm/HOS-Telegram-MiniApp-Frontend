@@ -100,7 +100,7 @@ export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
                       <img
                         src={requestButton}
                         alt="requestButton"
-                        className="w-[16px] h-[16px] rounded-full border-2 border-primary-border"
+                        className="w-[50px] h-[50px] rounded-full border-2 border-primary-border"
                       />
                     </div>
                   </Button>
