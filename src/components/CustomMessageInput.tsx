@@ -45,7 +45,7 @@ export function CustomMessageInput({ onSendMessage }: CustomMessageInputProps) {
         <img
           src={sendButton}
           alt="sendButton"
-          className="w-[50px] h-[50px] rounded-full border-2 border-primary-border"
+          className="w-[40px] h-[40px] rounded-full border-2 border-primary-border"
         />
         {/* <Send size={14} /> */}
       </Button>
