@@ -4,17 +4,17 @@ import { MapPin, Coffee, Shield, Search, Timer } from "lucide-react";
 export const templates: TemplateMessage[] = [
     {
       id: 'pretrip',
-      text: 'Pre Trip Inspection',
+      text: '15min Pre Trip Inspection',
       icon: MapPin,
-      needsTime: true,
+      needsTime: false,
       variant: 'template',
       description: 'Required safety check before starting'
     },
     {
       id: 'break',
-      text: 'Break Time',
+      text: '30min Break Time',
       icon: Coffee,
-      needsTime: true,
+      needsTime: false,
       variant: 'accent',
       description: 'Rest period notification'
     },
