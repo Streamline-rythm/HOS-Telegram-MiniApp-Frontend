@@ -96,11 +96,14 @@ export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
                         </div>
                       </div>
                       {/* <Send size={16} className="opacity-60" /> */}
-                      <img
+                      {/* <img
                         src={requestButton}
                         alt="requestButton"
                         className="w-[40px] h-[40px] rounded-full border-2 border-primary-border"
-                      />
+                      /> */}
+                      <div className="bg-yellow-500 w-[100px]">
+                        <p className="text-white">Click Request</p>
+                      </div>
                     </div>
                   </Button>
                 </AlertDialogTrigger>
