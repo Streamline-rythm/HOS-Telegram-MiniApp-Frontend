@@ -101,7 +101,7 @@ export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
                         alt="requestButton"
                         className="w-[40px] h-[40px] rounded-full border-2 border-primary-border"
                       /> */}
-                      <p className="bg-yellow-600 text-white px-1 rounded-[2px]">Click</p>
+                      <p className="bg-yellow-600 text-white px-1 rounded-[3px]">Click</p>
                     </div>
                   </Button>
                 </AlertDialogTrigger>
