@@ -42,11 +42,12 @@ export function CustomMessageInput({ onSendMessage }: CustomMessageInputProps) {
         variant="minimal"
         size="sm"
       >
-        <img
+        <p className="bg-yellow-600 text-white px-1">Send</p>
+        {/* <img
           src={sendButton}
           alt="sendButton"
           className="w-[40px] h-[40px] rounded-full border-2 border-primary-border"
-        />
+        /> */}
         {/* <Send size={14} /> */}
       </Button>
     </div>
