@@ -42,7 +42,7 @@ export function CustomMessageInput({ onSendMessage }: CustomMessageInputProps) {
         variant="minimal"
         size="sm"
       >
-        <p className="bg-yellow-600 text-white px-1">Send</p>
+        <p className="bg-yellow-600 text-white px-[8px] py-[4px]">Send</p>
         {/* <img
           src={sendButton}
           alt="sendButton"
