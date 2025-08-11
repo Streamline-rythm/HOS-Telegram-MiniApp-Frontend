@@ -44,11 +44,12 @@ export const templates: TemplateMessage[] = [
     }
   ];
 
-  export const timeOptions = Array.from({ length: 40 }, (_, i) => ({
+  export const timeOptions = Array.from({ length: 11 }, (_, i) => ({
     value: `${i + 1}h`,
     label: `${i + 1} hour${i === 0 ? '' : 's'}`,
   }));
-  timeOptions.unshift({ value: "30min", label: "30min" });
-  timeOptions.unshift({ value: "15min", label: "15min" });
+  // timeOptions.unshift({ value: "30min", label: "30min" });
+  // timeOptions.unshift({ value: "15min", label: "15min" });
+  timeOptions.push({ value: "34h", label: "34 hours" });
 
   export const quickTimeOptions = ["30min", "1h", "4h", "11h"];
