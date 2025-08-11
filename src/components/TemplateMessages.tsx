@@ -83,7 +83,7 @@ export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
                 <AlertDialogTrigger asChild>
                   <Button
                     variant="template"
-                    className="w-full justify-start gap-3 px-4 py-2 h-auto min-h-[60px] flex-col items-start bg-primary "
+                    className="w-full justify-start gap-3 px-[4px] py-2 h-auto min-h-[60px] flex-col items-start bg-primary "
                   >
                     <div className="flex items-center gap-3 w-full">
                       <Icon size={22} />
@@ -101,7 +101,7 @@ export function TemplateMessages({ onSendMessage }: TemplateMessagesProps) {
                         alt="requestButton"
                         className="w-[40px] h-[40px] rounded-full border-2 border-primary-border"
                       /> */}
-                      <p className="bg-yellow-500 text-white px-1 w-[22px]">Click</p>
+                      <p className="bg-yellow-500 text-white px-1">Click</p>
                     </div>
                   </Button>
                 </AlertDialogTrigger>
